@@ -98,3 +98,9 @@ that have been published.
 Please replace this README file with information about your specific project. You can keep
 the `Developing.md` and `Publishing.md` files as useful referenced, but please set some
 proper description in the README.
+
+## Sources from where I studied
+
+[Video](https://www.youtube.com/watch?v=Vh_h5iKF5B4&t=3645s&ab_channel=envoylabs)
+
+[Anatomy of a Smart Contract](https://docs.cosmwasm.com/dev-academy/develop-smart-contract/intro)
