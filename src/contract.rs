@@ -41,6 +41,7 @@ pub fn execute(
     match msg {
         ExecuteMsg::Increment {} => execute::increment(deps),
         ExecuteMsg::Reset { count } => execute::reset(deps, info, count),
+        ExecuteMsg::AddValue { value } => execute::add_value(deps, value),
     }
 }
 
@@ -65,6 +66,15 @@ pub mod execute {
             Ok(state)
         })?;
         Ok(Response::new().add_attribute("action", "reset"))
+    }
+
+    pub fn add_value(deps: DepsMut, value: i32) -> Result<Response, ContractError> {
+        STATE.update(deps.storage, |mut state| -> Result<_, ContractError> {
+            state.count += value;
+            Ok(state)
+        })?;
+
+        Ok(Response::new().add_attribute("action", "increment"))
     }
 }
 
@@ -152,5 +162,24 @@ mod tests {
         let res = query(deps.as_ref(), mock_env(), QueryMsg::GetCount {}).unwrap();
         let value: GetCountResponse = from_binary(&res).unwrap();
         assert_eq!(5, value.count);
+    }
+
+    #[test]
+    fn add_value() {
+        let mut deps = mock_dependencies();
+
+        let msg = InstantiateMsg { count: 15 };
+        let info = mock_info("creator", &coins(2, "token"));
+        let _res = instantiate(deps.as_mut(), mock_env(), info, msg).unwrap();
+
+        // beneficiary can release it
+        let info = mock_info("anyone", &coins(2, "token"));
+        let msg = ExecuteMsg::AddValue { value: 5 };
+        let _res = execute(deps.as_mut(), mock_env(), info, msg).unwrap();
+
+        // should increase counter by 1
+        let res = query(deps.as_ref(), mock_env(), QueryMsg::GetCount {}).unwrap();
+        let value: GetCountResponse = from_binary(&res).unwrap();
+        assert_eq!(20, value.count);
     }
 }
